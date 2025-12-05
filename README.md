@@ -7,7 +7,7 @@ How it works
 
 You pass your HTML as a base64 value in the data parameter:
 
-https://username.github.io/repo/?data=BASE64_HERE
+https://parallax6a75.github.io/DataURLDecoder/?data=BASE64_HERE
 
 
 The script decodes it and writes the HTML into the page.
