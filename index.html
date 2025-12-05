@@ -4,21 +4,37 @@
 <body>
 <script>
   const params = new URLSearchParams(location.search);
-  const encoded = params.get("data");
+  let encoded = params.get("data");
 
-  function decodeUTF8(b64) {
-    const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-    return new TextDecoder("utf-8").decode(bytes);
+  function encodeUTF8(str) {
+    return btoa(
+      new Uint8Array(new TextEncoder().encode(str))
+        .reduce((data, byte) => data + String.fromCharCode(byte), '')
+    );
   }
 
   if (!encoded) {
-    document.body.textContent = "No data";
+    const htmlInput = prompt("Enter your HTML:");
+    if (!htmlInput) {
+      document.body.textContent = "No HTML provided";
+    } else {
+      const b64 = encodeUTF8(htmlInput);
+      const url = location.origin + location.pathname + "?data=" + encodeURIComponent(b64);
+      const link = document.createElement("a");
+      link.href = url;
+      link.textContent = "Here is your link";
+      link.target = "_blank";
+      document.body.appendChild(link);
+      document.body.appendChild(document.createElement("br"));
+      document.body.appendChild(document.createTextNode(url));
+    }
   } else {
     try {
-      const html = decodeUTF8(encoded);
+      const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
+      const html = new TextDecoder("utf-8").decode(bytes);
       document.write(html);
     } catch (e) {
-      document.body.textContent = "Error";
+      document.body.textContent = "Decoding error";
     }
   }
 </script>
