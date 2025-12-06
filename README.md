@@ -29,7 +29,7 @@ Manual encoding (optional)
 
 If you want to encode HTML yourself, run this in the browser console:
 
-LZString.compressToEncodedURIComponent("<h1>Hello</h1>");
+LZString.compressToEncodedURIComponent("\<h1\>Hello\</h1\>");
 
 
 Use the result as the data value:
