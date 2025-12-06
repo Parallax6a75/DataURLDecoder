@@ -1,40 +1,38 @@
 <!doctype html>
 <html>
-<meta charset="utf-8">
+<head>
+  <meta charset="utf-8">
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
+</head>
 <body>
 <script>
   const params = new URLSearchParams(location.search);
   let encoded = params.get("data");
 
-  function encodeUTF8(str) {
-    return btoa(
-      new Uint8Array(new TextEncoder().encode(str))
-        .reduce((data, byte) => data + String.fromCharCode(byte), '')
-    );
+  function outputLink(html) {
+    const compressed = LZString.compressToEncodedURIComponent(html);
+    const url = location.origin + location.pathname + "?data=" + compressed;
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.textContent = "Your link";
+    a.target = "_blank";
+
+    document.body.appendChild(a);
+    document.body.appendChild(document.createElement("br"));
+    document.body.append(url);
   }
 
   if (!encoded) {
     const htmlInput = prompt("Enter your HTML:");
-    if (!htmlInput) {
-      document.body.textContent = "No HTML provided";
-    } else {
-      const b64 = encodeUTF8(htmlInput);
-      const url = location.origin + location.pathname + "?data=" + encodeURIComponent(b64);
-      const link = document.createElement("a");
-      link.href = url;
-      link.textContent = "Here is your link";
-      link.target = "_blank";
-      document.body.appendChild(link);
-      document.body.appendChild(document.createElement("br"));
-      document.body.appendChild(document.createTextNode(url));
-    }
+    if (!htmlInput) document.body.textContent = "No HTML provided";
+    else outputLink(htmlInput);
   } else {
-    try {
-      const bytes = Uint8Array.from(atob(encoded), c => c.charCodeAt(0));
-      const html = new TextDecoder("utf-8").decode(bytes);
+    const html = LZString.decompressFromEncodedURIComponent(encoded);
+    if (!html) {
+      document.body.textContent = "Decompression error";
+    } else {
       document.write(html);
-    } catch (e) {
-      document.body.textContent = "Decoding error";
     }
   }
 </script>
